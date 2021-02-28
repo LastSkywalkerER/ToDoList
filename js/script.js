@@ -66,10 +66,17 @@ class Todo {
   }
 
   editItem(element) {
-    let newValue = prompt('Введите новое дело').trim();
+    let newValue;
+
     while (!newValue) {
-      newValue = prompt('Введите новое дело').trim();
+      newValue = prompt('Введите новое дело');
+      if (newValue) {
+        newValue = newValue.trim();
+      } else {
+        return;
+      }
     }
+
     const item = {
       value: newValue,
       completed: this.todoData.get(element).completed,
