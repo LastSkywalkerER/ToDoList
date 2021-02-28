@@ -81,18 +81,100 @@ class Todo {
   }
 
   removeItem(element) {
-    this.todoData.delete(element);
-    this.render();
+    const currentLi = document.getElementsByClassName(element)[0];
+
+    let positionX = 0;
+
+    currentLi.style.position = 'relative';
+
+    const removeAnimation = () => {
+      positionX += 25;
+      currentLi.style.right = `${positionX}px`;
+
+      console.log(positionX);
+
+      if (positionX < document.documentElement.clientWidth) {
+        setTimeout(removeAnimation, 1);
+      } else {
+        this.todoData.delete(element);
+        this.render();
+      }
+
+    };
+
+    removeAnimation();
+
   }
+
   completeItem(element) {
+    const currentLi = document.getElementsByClassName(element)[0];
+    let currentY = currentLi.getBoundingClientRect().top + document.documentElement.scrollTop;
+
+    console.log(currentY);
+
+    if (this.todoData.get(element).completed) {
+      this.todoList.insertAdjacentHTML('beforeend', '<li class="test-li"></li>');
+      currentY -= this.todoList.clientHeight + 80;
+    } else {
+      this.todoCompleted.insertAdjacentHTML('beforeend', '<li class="test-li"></li>');
+    }
+
+    console.log(currentY);
+
+    const targetLis = document.getElementsByClassName('test-li'),
+      targetLi = targetLis[targetLis.length - 1],
+      targetY = targetLi.getBoundingClientRect().top + document.documentElement.scrollTop - 60;
+
+    const completeAnimation = () => {
+      currentLi.classList.add('todo-item__abs');
+
+      currentY += 10;
+
+      currentLi.style.top = `${currentY}px`;
+
+      console.log(currentY, targetY);
+
+      if (currentY < targetY) {
+        setTimeout(completeAnimation, 10);
+      } else {
+        this.todoData.delete(element);
+        this.todoData.set(element, item);
+        this.render();
+      }
+    };
+
+    const uncompleteAnimation = () => {
+      currentLi.style.position = 'absolute';
+
+      currentY -= 10;
+
+      currentLi.style.top = `${currentY}px`;
+
+      console.log(currentY, targetY);
+
+      if (currentY > targetY) {
+        setTimeout(uncompleteAnimation, 10);
+      } else {
+        this.todoData.delete(element);
+        this.todoData.set(element, item);
+        this.render();
+      }
+    };
+
+    if (this.todoData.get(element).completed) {
+      uncompleteAnimation();
+    } else {
+      completeAnimation();
+    }
+
+
     const item = {
       value: this.todoData.get(element).value,
       completed: !this.todoData.get(element).completed,
       key: this.todoData.get(element).key,
     };
-    this.todoData.delete(element);
-    this.todoData.set(element, item);
-    this.render();
+
+
   }
 
   handler() {
